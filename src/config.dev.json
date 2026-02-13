@@ -1,0 +1,4 @@
+{
+    "apiHost": "http://localhost:8443",
+    "wsHost": "ws://localhost:8443"
+}
