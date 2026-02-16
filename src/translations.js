@@ -18,6 +18,7 @@ export default {
     "input_error": "Fields id and password both must be filled",
     "create_lobby": "Want to create a new lobby?",
     "create": "Create",
+
   },
   "uk": {
     "you": "Ви",
@@ -38,5 +39,6 @@ export default {
     "input_error": "Поля id та пароль лоббі повинні бути заповнені",
     "create_lobby": "Хочете створити нове лоббі?",
     "create": "Створити",
+    
   },
 };

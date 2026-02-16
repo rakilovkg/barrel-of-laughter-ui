@@ -25,7 +25,6 @@ export default function JoinPage() {
   const timeoutRef = useRef(null);
 
   const handleJoinLobbyClick = async () => {
-    console.log( input );
     if (!input.lobbyId || !input.lobbyPassword) {
       setInputError(tr("input_error"));
 

@@ -9,36 +9,54 @@ export default function LobbyPage() {
   const { setState, state, tr } = useContext(PlayerContext);
   const [showPlayers, setShowPlayers] = useState(false);
   const disconnectRequest = useRequest();
+  const startRequest = useRequest();
 
   const onToggleButtonClicked = () => {
     setShowPlayers(prev => !prev);
   };
 
+  const onStartButtonClicked = async () => {
+    const newState = await startRequest.send("/lobby/start", "POST");
+    if (newState) {
+      setState(prev => ({ ...prev, ...newState }));
+    }
+  };
+
   useEffect(() => {
-    const eventSource = new EventSource(`${process.env.API_HOST}/lobby/events?lobbyId=${state.lobby.id}`);
+    const eventSource = new EventSource(`${process.env.API_HOST}/lobby/events?lobbyId=${state.lobby.id}`, { withCredentials: true, });
     
     eventSource.onmessage = (message) =>  {
       const data = JSON.parse(message.data);
-      if (data.type == "player_disconnected") {
-        setState(prev => ({ ...prev, lobby: { ...state.lobby, players: data.players, }}));
-      } else if (data.type == "author_disconnected") {
-        setState(prev => ({ ...prev, location: "join" }));
+      console.log(data);
+      switch (data.type) {
+        case "player_joined":
+        case "player_disconnected":
+          setState(prev => ({ ...prev, lobby: { ...state.lobby, players: data.players, }}));
+          break;
+        case "author_disconnected":
+          setState(prev => ({ ...prev, location: "join" }));
+          break;
+        case "game_started":
+          setState(prev => ({ ...prev, lobby: data.lobby }));
+          break;
       }
     };
     
   }, []);
 
-  const handleDisconnectClick = async (event) => {
+  const onDisconnectButtonClicked = async (event) => {
     const newState = await disconnectRequest.send("/lobby/disconnect", "POST");
     setState(prev => ({ ...prev, ...newState }));
   };
 
-  console.log(`State: ${JSON.stringify(state, null, 2)}`);
+  if (state.lobby.state == "active") {
+    return (<h1>GAME</h1>);
+  }
 
   return (
     <Container fluid className="lobby text-white p-3">
       {/* Disconnect button */}
-      <Button variant="danger" onClick={handleDisconnectClick} className="mb-4">Disconnect</Button>
+      <Button variant="danger" onClick={onDisconnectButtonClicked} className="mb-4">Disconnect</Button>
 
       <Row className="g-3">
         {/* Lobby Info */}
@@ -87,8 +105,9 @@ export default function LobbyPage() {
 
               {
                 state.lobby.authorName == state.name && 
-                (<Button variant="primary" className="mt-3 w-100">{tr("start")}</Button>)
+                (<Button onClick={onStartButtonClicked} variant="primary" className="mt-3 w-100">{tr("start")}</Button>)
               }
+              { startRequest.error && <p className="text-danger mt-2">{startRequest.error.message}</p> }
             </Card.Body>
           </Card>
         </Col>
@@ -110,13 +129,13 @@ export default function LobbyPage() {
                       <BsPerson size={24} />
                     </td>
                     <td>
-                      {state.lobby.authorName + " (Host)"}
+                      {state.lobby.authorName + " (Author)"}
                     </td>
                   </tr>
                   {
                     state.lobby.players.map(
                       player =>
-                        <tr>
+                        <tr key={player}>
                           <td><BsPerson size={24} /></td>
                           <td>{player}</td>
                         </tr>
