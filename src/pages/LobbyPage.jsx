@@ -5,6 +5,8 @@ import useRequest from "../useRequest";
 
 import PlayerContext from "../PlayerContext";
 
+import GamePage from "./GamePage";
+
 export default function LobbyPage() {
   const { setState, state, tr } = useContext(PlayerContext);
   const [showPlayers, setShowPlayers] = useState(false);
@@ -50,7 +52,7 @@ export default function LobbyPage() {
   };
 
   if (state.lobby.state == "active") {
-    return (<h1>GAME</h1>);
+    return <GamePage />;
   }
 
   return (

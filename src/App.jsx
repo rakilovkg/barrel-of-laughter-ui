@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import NameInputPage from "./pages/NameInputPage";
 import LobbyPage from "./pages/LobbyPage";
 import JoinPage from "./pages/JoinPage";
+
 import GamePage from "./pages/GamePage";
 
 import useTranslate from "./useTranslate";
@@ -22,6 +23,7 @@ export default function App() {
     async function fetchState() {
       const state = await playerRequest.send("/players");
       setState(state);
+      console.log(state);
     }
     fetchState();
   }, []);
@@ -29,13 +31,14 @@ export default function App() {
   let gameContainer;
   switch (state.location) {
     case "input":
-      gameContainer = <NameInputPage />;
-      break;
-    case "lobby":
-      gameContainer = <LobbyPage />;
+      // gameContainer = <NameInputPage />;
+      gameContainer = <GamePage />;
       break;
     case "join":
       gameContainer = <JoinPage />;
+      break;
+    case "lobby":
+      gameContainer = <LobbyPage />;
       break;
   }
 

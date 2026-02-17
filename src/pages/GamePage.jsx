@@ -1,18 +1,26 @@
-import React, { useContext, useEffect, useState } from "react";
-import { BsPerson, BsList } from "react-icons/bs";
-import { Button, Card, Container, Row, Col, Table } from "react-bootstrap";
+import React, { useContext, useState } from "react";
+import {
+  Button,
+  Card,
+  Container,
+  Row,
+  Col,
+  Table,
+  Tabs,
+  Tab,
+  Offcanvas,
+  Badge
+} from "react-bootstrap";
+import { BsPersonFill, BsList, BsClock } from "react-icons/bs";
 import useRequest from "../useRequest";
 import PlayerContext from "../PlayerContext";
 
 export default function GamePage() {
   const { state, setState, tr } = useContext(PlayerContext);
-  const [showPlayers, setShowPlayers] = useState(false);
+  const [activeTab, setActiveTab] = useState("your");
+  const [showScores, setShowScores] = useState(false);
 
   const selectCardRequest = useRequest();
-
-  const onToggleButtonClicked = () => {
-    setShowPlayers(prev => !prev);
-  };
 
   const onCardSelected = async (cardId) => {
     const newState = await selectCardRequest.send(
@@ -26,156 +34,159 @@ export default function GamePage() {
     }
   };
 
-  useEffect(() => {
-    const eventSource = new EventSource(
-      `${process.env.API_HOST}/game/events?lobbyId=${state.lobby.id}`,
-      { withCredentials: true }
-    );
+  const selectedCards = [
+    { text: "Stinky socks" },
+    { text: "Data science" },
+    { text: "Explosive toilet" },
+    { text: "Zombie with crowbar leg" },
+  ];
 
-    eventSource.onmessage = (message) => {
-      const data = JSON.parse(message.data);
-
-      switch (data.type) {
-        case "game_state_updated":
-          setState(prev => ({ ...prev, ...data.state }));
-          break;
-
-        case "player_disconnected":
-          setState(prev => ({
-            ...prev,
-            game: { ...prev.game, players: data.players }
-          }));
-          break;
-
-        case "game_finished":
-          setState(prev => ({ ...prev, location: "results" }));
-          break;
-
-        default:
-          break;
-      }
-    };
-
-    return () => eventSource.close();
-  }, []);
+  const players = [
+    { name: "Ben (Author)", score: 0 },
+    { name: "John (Host)", score: 0 },
+    { name: "Daniel", score: 0 },
+    { name: "Clark", score: 0 },
+  ];
 
   return (
     <Container fluid className="game text-white p-3">
-        <h1>GAMW!!</h1>
+
+      {/* TOP BAR */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <strong>Round #1</strong>
+        </div>
+        <div className="d-flex align-items-center gap-2">
+          <BsClock />
+          <Badge bg="danger">00:42</Badge>
+        </div>
+      </div>
+
       <Row className="g-3">
-        {/* Game Board */}
-        <Col
-          xs={12}
-          md={8}
-          className={`${showPlayers ? "d-none d-md-block" : "d-block"}`}
-        >
-          {/* Template Card */}
-          <Card bg="dark" text="white" className="shadow mb-3">
+
+        {/* LEFT SIDE (Template) */}
+        <Col xs={12} md={4}>
+          <Card className="template-card shadow-sm">
             <Card.Body>
               <Card.Title>{tr("template_card")}</Card.Title>
-              <Card className="bg-secondary text-white p-3 mt-2">
-                {}
-              </Card>
-            </Card.Body>
-          </Card>
-
-          {/* Selected Cards */}
-          <Card bg="dark" text="white" className="shadow mb-3">
-            <Card.Body>
-              <Card.Title>{tr("selected_cards")}</Card.Title>
-              <Row className="g-2 mt-2">
-                {state.game.selectedCards?.map((card, index) => (
-                  <Col xs={12} sm={6} key={index}>
-                    <Card className="bg-light text-dark p-2">
-                      {card.text}
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            </Card.Body>
-          </Card>
-
-          {/* Available Cards */}
-          <Card bg="dark" text="white" className="shadow">
-            <Card.Body>
-              <Card.Title>{tr("your_cards")}</Card.Title>
-
-              <Row className="g-2 mt-2">
-                {state.game.availableCards?.map(card => (
-                  <Col xs={12} sm={6} key={card.id}>
-                    <Card
-                      className="bg-white text-dark p-2 selectable-card"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => onCardSelected(card.id)}
-                    >
-                      {card.text}
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-
-              {selectCardRequest.error && (
-                <p className="text-danger mt-2">
-                  {selectCardRequest.error.message}
-                </p>
-              )}
+              <div className="template-content">
+                The school trip was ruined by ____.
+              </div>
             </Card.Body>
           </Card>
         </Col>
 
-        {/* Players & Scores */}
-        <Col
-          xs={12}
-          md={4}
-          className={`${showPlayers ? "d-block" : "d-none d-md-block"}`}
-        >
-          <Card bg="dark" text="white" className="shadow h-100">
-            <Card.Body>
-              <Card.Title>{tr("players")}</Card.Title>
+        {/* MAIN AREA */}
+        <Col xs={12} md={5}>
 
-              <Table variant="dark" hover responsive>
-                <tbody>
-                  {state.game.players?.map(player => (
-                    <tr key={player.name}>
-                      <td width="40">
-                        <BsPerson size={20} />
-                      </td>
-                      <td>{player.name}</td>
-                      <td className="text-end">
-                        <strong>{player.score}</strong>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+          {/* Mobile Tabs */}
+          <Tabs
+            activeKey={activeTab}
+            onSelect={(k) => setActiveTab(k)}
+            className="mb-3 d-md-none"
+          >
+            <Tab eventKey="your" title={tr("your_cards")} />
+            <Tab eventKey="selected" title={tr("selected_cards")} />
+          </Tabs>
 
-              {/* Mobile toggle */}
-              <Button
-                variant="outline-light"
-                className="d-md-none mt-2"
-                onClick={onToggleButtonClicked}
-              >
-                <BsList className="me-2" />
-                {tr("view_game")}
-              </Button>
-            </Card.Body>
-          </Card>
+          {/* DESKTOP TITLES */}
+          <div className="d-none d-md-block mb-2">
+            <h5>
+              {activeTab === "your"
+                ? tr("your_cards")
+                : tr("selected_cards")}
+            </h5>
+          </div>
+
+          {/* CARDS GRID */}
+          <Row className="g-2">
+
+            {/* Your Cards */}
+            {(activeTab === "your" || window.innerWidth >= 768) &&
+              state.game?.availableCards?.map(card => (
+                <Col xs={6} key={card.id}>
+                  <Card
+                    className="game-card selectable"
+                    onClick={() => onCardSelected(card.id)}
+                  >
+                    {card.text}
+                  </Card>
+                </Col>
+              ))}
+
+            {/* Selected Cards */}
+            {(activeTab === "selected") &&
+              selectedCards.map((card, index) => (
+                <Col xs={6} key={index}>
+                  <Card className="game-card selected">
+                    {card.text}
+                  </Card>
+                </Col>
+              ))}
+          </Row>
+
+          {selectCardRequest.error && (
+            <p className="text-danger mt-2">
+              {selectCardRequest.error.message}
+            </p>
+          )}
+        </Col>
+
+        {/* DESKTOP SCORE PANEL */}
+        <Col md={3} className="d-none d-md-block">
+          <ScorePanel players={players} tr={tr} />
         </Col>
       </Row>
 
-      {/* Mobile Toggle Button (Board View) */}
-      <div className="d-md-none mt-3">
-        {!showPlayers && (
-          <Button
-            variant="outline-light"
-            className="w-100"
-            onClick={onToggleButtonClicked}
-          >
-            <BsList className="me-2" />
-            {tr("view_players")}
-          </Button>
-        )}
-      </div>
+      {/* MOBILE FLOATING BUTTON */}
+      <Button
+        variant="light"
+        className="d-md-none position-fixed bottom-0 end-0 m-3 rounded-circle shadow"
+        style={{ width: 56, height: 56 }}
+        onClick={() => setShowScores(true)}
+      >
+        <BsList />
+      </Button>
+
+      {/* MOBILE OFFCANVAS SCORES */}
+      <Offcanvas
+        show={showScores}
+        onHide={() => setShowScores(false)}
+        placement="end"
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>{tr("players")}</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <ScorePanel players={players} tr={tr} />
+        </Offcanvas.Body>
+      </Offcanvas>
+
     </Container>
+  );
+}
+
+function ScorePanel({ players, tr }) {
+  return (
+    <Card className="shadow-sm h-100">
+      <Card.Body>
+        <Card.Title>{tr("players")}</Card.Title>
+        <Table responsive>
+          <tbody>
+            {players.map(player => (
+              <tr key={player.name}>
+                <td width="40">
+                  <BsPersonFill />
+                </td>
+                <td>{player.name}</td>
+                <td className="text-end fw-bold">
+                  {player.score}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Card.Body>
+    </Card>
   );
 }
