@@ -52,9 +52,9 @@ export default function App() {
   
   return (
     <PlayerContext.Provider value={{ state, setState, tr, language, setLanguage }}>
-      <div className="w-100 h-100 bg-dark">
+      <div className="h-100 d-flex flex-column bg-dark">
         <Header />
-        <div className="p-4 w-100">
+        <div className="flex-grow-1 p-4">
           { gameContainer }
         </div>
       </div>

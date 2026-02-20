@@ -18,6 +18,8 @@ export default {
     "input_error": "Fields id and password both must be filled",
     "create_lobby": "Want to create a new lobby?",
     "create": "Create",
+    "your_cards": "Your cards",
+    "selected_cards": "Selected cards",
 
   },
   "uk": {
@@ -39,6 +41,8 @@ export default {
     "input_error": "Поля id та пароль лоббі повинні бути заповнені",
     "create_lobby": "Хочете створити нове лоббі?",
     "create": "Створити",
-    
+    "your_cards": "Ваші карти",
+    "selected_cards": "Вибрані карти",
+
   },
 };

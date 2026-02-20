@@ -35,10 +35,28 @@ export default function GamePage() {
   };
 
   const selectedCards = [
-    { text: "Stinky socks" },
-    { text: "Data science" },
-    { text: "Explosive toilet" },
-    { text: "Zombie with crowbar leg" },
+    { text: "Stinky socks", id: 0, },
+    { text: "Data science", id: 1, },
+    { text: "Explosive toilet", id: 2, },
+    { text: "Zombie with crowbar leg", id: 3, },
+    { text: "A", id: 4, },
+
+    
+    { text: "B", id: 5, },
+    { text: "C", id: 6, },
+    { text: "D", id: 7, },
+    
+  ];
+
+  const availableCards = [
+    { text: "Weird IT guy", id: 0, },
+    { text: "Island of doom", id: 1, },
+    { text: "BOMB!", id: 2, },
+    { text: "WOWOW", id: 3, },
+    { text: "XXX", id: 4, },
+
+    { text: "WOWOW", id: 5, },
+    { text: "XXX", id: 6, },
   ];
 
   const players = [
@@ -49,118 +67,66 @@ export default function GamePage() {
   ];
 
   return (
-    <Container fluid className="game text-white p-3">
-
-      {/* TOP BAR */}
+    <Container fluid className="game text-white h-100 d-flex flex-column g-2">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
-          <strong>Round #1</strong>
+          <strong>Round #1 - Draft</strong>
         </div>
         <div className="d-flex align-items-center gap-2">
           <BsClock />
           <Badge bg="danger">00:42</Badge>
         </div>
       </div>
-
-      <Row className="g-3">
-
-        {/* LEFT SIDE (Template) */}
-        <Col xs={12} md={4}>
-          <Card className="template-card shadow-sm">
+      <Row>
+        <Col xs={12} md={2} className="h-100">
+          <Card className="template-card bg-light text-dark d-flex align-items-start justify-content-start h-100">
             <Card.Body>
-              <Card.Title>{tr("template_card")}</Card.Title>
-              <div className="template-content">
-                The school trip was ruined by ____.
-              </div>
+              The school trip was ruined by ____.
             </Card.Body>
           </Card>
         </Col>
 
-        {/* MAIN AREA */}
-        <Col xs={12} md={5}>
-
-          {/* Mobile Tabs */}
-          <Tabs
-            activeKey={activeTab}
-            onSelect={(k) => setActiveTab(k)}
-            className="mb-3 d-md-none"
-          >
-            <Tab eventKey="your" title={tr("your_cards")} />
-            <Tab eventKey="selected" title={tr("selected_cards")} />
-          </Tabs>
-
-          {/* DESKTOP TITLES */}
-          <div className="d-none d-md-block mb-2">
-            <h5>
-              {activeTab === "your"
-                ? tr("your_cards")
-                : tr("selected_cards")}
-            </h5>
-          </div>
-
-          {/* CARDS GRID */}
-          <Row className="g-2">
-
-            {/* Your Cards */}
-            {(activeTab === "your" || window.innerWidth >= 768) &&
-              state.game?.availableCards?.map(card => (
-                <Col xs={6} key={card.id}>
-                  <Card
-                    className="game-card selectable"
-                    onClick={() => onCardSelected(card.id)}
-                  >
+        <Col xs={12} md={7} className="">
+          <Row className="row-cols-5 h-100">
+            {selectedCards.map((card, index) => (
+              <Col key={index} className="h-50">
+                <Card className="h-100">
+                  <Card.Body>
                     {card.text}
-                  </Card>
-                </Col>
-              ))}
-
-            {/* Selected Cards */}
-            {(activeTab === "selected") &&
-              selectedCards.map((card, index) => (
-                <Col xs={6} key={index}>
-                  <Card className="game-card selected">
-                    {card.text}
-                  </Card>
-                </Col>
-              ))}
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
           </Row>
-
-          {selectCardRequest.error && (
-            <p className="text-danger mt-2">
-              {selectCardRequest.error.message}
-            </p>
-          )}
         </Col>
 
-        {/* DESKTOP SCORE PANEL */}
-        <Col md={3} className="d-none d-md-block">
+        <Col md={3} className="d-none d-md-block bg-dark text-light">
           <ScorePanel players={players} tr={tr} />
         </Col>
       </Row>
 
-      {/* MOBILE FLOATING BUTTON */}
-      <Button
-        variant="light"
-        className="d-md-none position-fixed bottom-0 end-0 m-3 rounded-circle shadow"
-        style={{ width: 56, height: 56 }}
-        onClick={() => setShowScores(true)}
-      >
-        <BsList />
-      </Button>
-
-      {/* MOBILE OFFCANVAS SCORES */}
-      <Offcanvas
-        show={showScores}
-        onHide={() => setShowScores(false)}
-        placement="end"
-      >
-        <Offcanvas.Header closeButton>
-          <Offcanvas.Title>{tr("players")}</Offcanvas.Title>
-        </Offcanvas.Header>
-        <Offcanvas.Body>
-          <ScorePanel players={players} tr={tr} />
-        </Offcanvas.Body>
-      </Offcanvas>
+      <Row className="mt-4 h-100">
+        <Col xs={12} md={{ span: 7, offset: 2 }}>
+          <Card className="h-100 bg-dark">
+            <Card.Body>
+              <Row className="row-cols-5 h-50">
+                {availableCards.map(card => (
+                  <Col key={card.id} className="d-flex h-100">
+                    <Card
+                      onClick={() => onCardSelected(card.id)}
+                      className="flex-grow-1 h-100"
+                    >
+                      <Card.Body>
+                        {card.text}
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
     </Container>
   );
@@ -168,18 +134,18 @@ export default function GamePage() {
 
 function ScorePanel({ players, tr }) {
   return (
-    <Card className="shadow-sm h-100">
+    <Card className="h-100 bg-dark">
       <Card.Body>
         <Card.Title>{tr("players")}</Card.Title>
         <Table responsive>
           <tbody>
             {players.map(player => (
-              <tr key={player.name}>
-                <td width="40">
-                  <BsPersonFill />
+              <tr key={player.name} className="text-light">
+                <td width="40" className="bg-dark">
+                  <BsPersonFill className="text-white" />
                 </td>
-                <td>{player.name}</td>
-                <td className="text-end fw-bold">
+                <td className="bg-dark text-light">{player.name}</td>
+                <td className="text-end fw-bold bg-dark text-light">
                   {player.score}
                 </td>
               </tr>
