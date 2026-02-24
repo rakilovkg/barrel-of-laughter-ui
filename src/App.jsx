@@ -31,8 +31,7 @@ export default function App() {
   let gameContainer;
   switch (state.location) {
     case "input":
-      // gameContainer = <NameInputPage />;
-      gameContainer = <GamePage />;
+      gameContainer = <NameInputPage />;
       break;
     case "join":
       gameContainer = <JoinPage />;

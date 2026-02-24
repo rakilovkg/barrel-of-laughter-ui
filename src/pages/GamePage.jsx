@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   Button,
   Card,
@@ -51,12 +51,12 @@ export default function GamePage() {
   const availableCards = [
     { text: "Weird IT guy", id: 0, },
     { text: "Island of doom", id: 1, },
-    { text: "BOMB!", id: 2, },
-    { text: "WOWOW", id: 3, },
-    { text: "XXX", id: 4, },
+    { text: "Island of doom!", id: 2, },
+    { text: "Island of doom", id: 3, },
+    { text: "Island of doom", id: 4, },
 
-    { text: "WOWOW", id: 5, },
-    { text: "XXX", id: 6, },
+    { text: "Island of doom", id: 5, },
+    { text: "Island of doom", id: 6, },
   ];
 
   const players = [
@@ -66,59 +66,94 @@ export default function GamePage() {
     { name: "Clark", score: 0 },
   ];
 
+  useEffect(() => {
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const socket = new WebSocket(`${protocol}://${process.env.WS_HOST}`);
+  
+    socket.onopen = () => {
+      console.log("WS connected");
+    };
+  
+    socket.onmessage = (message) => {
+      console.log("Message:", message.data);
+    };
+  
+    socket.onerror = (err) => {
+      console.error("WS error:", err);
+    };
+  
+    socket.onclose = () => {
+      console.log("WS closed");
+    };
+  }, []);
+
   return (
-    <Container fluid className="game text-white h-100 d-flex flex-column g-2">
+    <Container fluid className="game text-white h-100 d-flex flex-column">
+  
+      {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
           <strong>Round #1 - Draft</strong>
         </div>
-        <div className="d-flex align-items-center gap-2">
-          <BsClock />
-          <Badge bg="danger">00:42</Badge>
+  
+        <div className="d-flex align-items-center gap-3">
+          <div className="d-flex align-items-center gap-2">
+            <BsClock />
+            <Badge bg="danger">00:42</Badge>
+          </div>
+  
+          {/* Mobile Players Button */}
+          <Button
+            variant="outline-light"
+            className="d-md-none"
+            onClick={() => setShowScores(true)}
+          >
+            <BsList />
+          </Button>
         </div>
       </div>
-      <Row>
-        <Col xs={12} md={2} className="h-100">
-          <Card className="template-card bg-light text-dark d-flex align-items-start justify-content-start h-100">
+  
+      {/* MAIN CONTENT */}
+      <Row className="flex-grow-1/2">
+  
+        {/* Template */}
+        <Col xs={12} md={2}>
+          <Card className="template-card bg-light text-dark h-100">
             <Card.Body>
               The school trip was ruined by ____.
             </Card.Body>
           </Card>
         </Col>
-
-        <Col xs={12} md={7} className="">
+  
+        {/* Desktop Selected Cards */}
+        <Col md={7} className="d-none d-md-block">
           <Row className="row-cols-5 h-100">
-            {selectedCards.map((card, index) => (
-              <Col key={index} className="h-50">
+            {selectedCards.map(card => (
+              <Col key={card.id} className="h-50">
                 <Card className="h-100">
-                  <Card.Body>
-                    {card.text}
-                  </Card.Body>
+                  <Card.Body>{card.text}</Card.Body>
                 </Card>
               </Col>
             ))}
           </Row>
         </Col>
-
-        <Col md={3} className="d-none d-md-block bg-dark text-light">
+  
+        {/* Desktop Score Panel */}
+        <Col md={3} className="flex-fill min-h-0">
           <ScorePanel players={players} tr={tr} />
         </Col>
       </Row>
-
-      <Row className="mt-4 h-100">
-        <Col xs={12} md={{ span: 7, offset: 2 }}>
-          <Card className="h-100 bg-dark">
+  
+      {/* Desktop Available Cards */}
+      <Row className="d-none d-md-flex flex-fill min-h-0">
+        <Col md={{ span: 7, offset: 2 }}>
+          <Card className="bg-dark">
             <Card.Body>
-              <Row className="row-cols-5 h-50">
+              <Row className="row-cols-5">
                 {availableCards.map(card => (
-                  <Col key={card.id} className="d-flex h-100">
-                    <Card
-                      onClick={() => onCardSelected(card.id)}
-                      className="flex-grow-1 h-100"
-                    >
-                      <Card.Body>
-                        {card.text}
-                      </Card.Body>
+                  <Col key={card.id}>
+                    <Card onClick={() => onCardSelected(card.id)}>
+                      <Card.Body>{card.text}</Card.Body>
                     </Card>
                   </Col>
                 ))}
@@ -127,7 +162,60 @@ export default function GamePage() {
           </Card>
         </Col>
       </Row>
-
+  
+      {/* MOBILE BOTTOM TABS */}
+      <div className="d-md-none position-fixed bottom-0 start-0 end-0 bg-dark border-top">
+        <Tabs
+          activeKey={activeTab}
+          onSelect={(k) => setActiveTab(k)}
+          className="mb-0"
+          fill
+        >
+          <Tab eventKey="your" title="Selected">
+            <div className="p-2">
+              <Row className="row-cols-2 g-2">
+                {selectedCards.map(card => (
+                  <Col key={card.id}>
+                    <Card>
+                      <Card.Body>{card.text}</Card.Body>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </div>
+          </Tab>
+  
+          <Tab eventKey="available" title="Available">
+            <div className="p-2">
+              <Row className="row-cols-2 g-2">
+                {availableCards.map(card => (
+                  <Col key={card.id}>
+                    <Card onClick={() => onCardSelected(card.id)}>
+                      <Card.Body>{card.text}</Card.Body>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </div>
+          </Tab>
+        </Tabs>
+      </div>
+  
+      {/* MOBILE PLAYERS OFFCANVAS */}
+      <Offcanvas
+        show={showScores}
+        onHide={() => setShowScores(false)}
+        placement="end"
+        className="bg-dark text-white"
+      >
+        <Offcanvas.Header closeButton closeVariant="white">
+          <Offcanvas.Title>{tr("players")}</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <ScorePanel players={players} tr={tr} />
+        </Offcanvas.Body>
+      </Offcanvas>
+  
     </Container>
   );
 }

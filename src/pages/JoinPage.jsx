@@ -78,7 +78,7 @@ export default function JoinPage() {
                 />
               </div>
 
-              { inputError && <span className="text-danger">{inputError}</span> }
+              { inputError && <span className="text-danger">{tr(inputError)}</span> }
               { joinLobbyRequest.error && <span className="text-danger">{joinLobbyRequest.error.message}</span> }
 
               <Button variant="success" className="mt-3 mb-3 w-100" onClick={handleJoinLobbyClick}>
