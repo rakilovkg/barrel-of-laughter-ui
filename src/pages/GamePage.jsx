@@ -116,11 +116,11 @@ export default function GamePage() {
       {/* MAIN CONTENT */}
       <Row className="flex-grow-1/2">
   
-        {/* Template */}
+        {/* Phrase */}
         <Col xs={12} md={2}>
           <Card className="template-card bg-light text-dark h-100">
             <Card.Body>
-              The school trip was ruined by ____.
+              {tr(state.lobby.phrase)}
             </Card.Body>
           </Card>
         </Col>
@@ -140,7 +140,7 @@ export default function GamePage() {
   
         {/* Desktop Score Panel */}
         <Col md={3} className="flex-fill min-h-0">
-          <ScorePanel players={players} tr={tr} />
+          <ScorePanel players={Object.keys(state.lobby.players)} tr={tr} />
         </Col>
       </Row>
   
@@ -212,7 +212,7 @@ export default function GamePage() {
           <Offcanvas.Title>{tr("players")}</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <ScorePanel players={players} tr={tr} />
+          <ScorePanel players={Object.keys(state.lobby.players)} tr={tr} />
         </Offcanvas.Body>
       </Offcanvas>
   

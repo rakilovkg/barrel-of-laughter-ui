@@ -92,7 +92,7 @@ export default function LobbyPage() {
               </div>
 
               <p className="mt-3">
-                {tr("connected_players")} {state.lobby.players.length + 1} / 10
+                {tr("connected_players")} {Object.keys(state.lobby.players).length} / 10
               </p>
 
               {/* Mobile toggle */}
@@ -130,16 +130,13 @@ export default function LobbyPage() {
                     <td width="50">
                       <BsPerson size={24} />
                     </td>
-                    <td>
-                      {state.lobby.authorName + " (Author)"}
-                    </td>
                   </tr>
                   {
-                    state.lobby.players.map(
+                    Object.keys(state.lobby.players).map(
                       player =>
                         <tr key={player}>
                           <td><BsPerson size={24} /></td>
-                          <td>{player}</td>
+                          <td>{player == state.lobby.authorName ? `${player} (Author)` : player}</td>
                         </tr>
                     )
                   }
