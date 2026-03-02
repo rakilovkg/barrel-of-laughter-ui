@@ -19,6 +19,7 @@ export default function LobbyPage() {
 
   const onStartButtonClicked = async () => {
     const newState = await startRequest.send("/lobby/start", "POST");
+    console.log(newState);
     if (newState) {
       setState(prev => ({ ...prev, ...newState }));
     }
@@ -39,6 +40,7 @@ export default function LobbyPage() {
           setState(prev => ({ ...prev, location: "join" }));
           break;
         case "game_started":
+          console.log(data.lobby);
           setState(prev => ({ ...prev, lobby: data.lobby }));
           break;
       }
@@ -51,8 +53,8 @@ export default function LobbyPage() {
     setState(prev => ({ ...prev, ...newState }));
   };
 
-  if (state.lobby.state == "active") {
-    return <GamePage />;
+  if (state.lobby.state != "waiting") {
+    return <GamePage state={state} setState={setState} tr={tr} />;
   }
 
   return (
@@ -92,7 +94,7 @@ export default function LobbyPage() {
               </div>
 
               <p className="mt-3">
-                {tr("connected_players")} {Object.keys(state.lobby.players).length} / 10
+                {tr("connected_players")} {state.lobby.players.length} / 10
               </p>
 
               {/* Mobile toggle */}
@@ -126,16 +128,11 @@ export default function LobbyPage() {
 
               <Table variant="dark" hover responsive>
                 <tbody>
-                  <tr>
-                    <td width="50">
-                      <BsPerson size={24} />
-                    </td>
-                  </tr>
                   {
-                    Object.keys(state.lobby.players).map(
+                    state.lobby.players.map(
                       player =>
                         <tr key={player}>
-                          <td><BsPerson size={24} /></td>
+                          <td width="50"><BsPerson size={24} /></td>
                           <td>{player == state.lobby.authorName ? `${player} (Author)` : player}</td>
                         </tr>
                     )

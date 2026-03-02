@@ -13,10 +13,8 @@ import {
 } from "react-bootstrap";
 import { BsPersonFill, BsList, BsClock } from "react-icons/bs";
 import useRequest from "../useRequest";
-import PlayerContext from "../PlayerContext";
 
-export default function GamePage() {
-  const { state, setState, tr } = useContext(PlayerContext);
+export default function GamePage({ state, setState, tr }) {
   const [activeTab, setActiveTab] = useState("your");
   const [showScores, setShowScores] = useState(false);
 
@@ -33,38 +31,6 @@ export default function GamePage() {
       setState(prev => ({ ...prev, ...newState }));
     }
   };
-
-  const selectedCards = [
-    { text: "Stinky socks", id: 0, },
-    { text: "Data science", id: 1, },
-    { text: "Explosive toilet", id: 2, },
-    { text: "Zombie with crowbar leg", id: 3, },
-    { text: "A", id: 4, },
-
-    
-    { text: "B", id: 5, },
-    { text: "C", id: 6, },
-    { text: "D", id: 7, },
-    
-  ];
-
-  const availableCards = [
-    { text: "Weird IT guy", id: 0, },
-    { text: "Island of doom", id: 1, },
-    { text: "Island of doom!", id: 2, },
-    { text: "Island of doom", id: 3, },
-    { text: "Island of doom", id: 4, },
-
-    { text: "Island of doom", id: 5, },
-    { text: "Island of doom", id: 6, },
-  ];
-
-  const players = [
-    { name: "Ben (Author)", score: 0 },
-    { name: "John (Host)", score: 0 },
-    { name: "Daniel", score: 0 },
-    { name: "Clark", score: 0 },
-  ];
 
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
@@ -128,7 +94,7 @@ export default function GamePage() {
         {/* Desktop Selected Cards */}
         <Col md={7} className="d-none d-md-block">
           <Row className="row-cols-5 h-100">
-            {selectedCards.map(card => (
+            {state.lobby.selectedCards.map(card => (
               <Col key={card.id} className="h-50">
                 <Card className="h-100">
                   <Card.Body>{card.text}</Card.Body>
@@ -150,7 +116,7 @@ export default function GamePage() {
           <Card className="bg-dark">
             <Card.Body>
               <Row className="row-cols-5">
-                {availableCards.map(card => (
+                {state.lobby.availableCards.map(card => (
                   <Col key={card.id}>
                     <Card onClick={() => onCardSelected(card.id)}>
                       <Card.Body>{card.text}</Card.Body>
@@ -174,7 +140,7 @@ export default function GamePage() {
           <Tab eventKey="your" title="Selected">
             <div className="p-2">
               <Row className="row-cols-2 g-2">
-                {selectedCards.map(card => (
+                {state.lobby.selectedCards.map(card => (
                   <Col key={card.id}>
                     <Card>
                       <Card.Body>{card.text}</Card.Body>
@@ -188,7 +154,7 @@ export default function GamePage() {
           <Tab eventKey="available" title="Available">
             <div className="p-2">
               <Row className="row-cols-2 g-2">
-                {availableCards.map(card => (
+                {state.availableCards.map(card => (
                   <Col key={card.id}>
                     <Card onClick={() => onCardSelected(card.id)}>
                       <Card.Body>{card.text}</Card.Body>
