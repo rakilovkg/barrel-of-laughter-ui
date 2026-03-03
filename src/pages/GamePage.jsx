@@ -86,7 +86,7 @@ export default function GamePage({ state, setState, tr }) {
         <Col xs={12} md={2}>
           <Card className="template-card bg-light text-dark h-100">
             <Card.Body>
-              {tr(state.lobby.phrase)}
+              {tr(state.lobby.currentPhrase)}
             </Card.Body>
           </Card>
         </Col>
@@ -95,9 +95,9 @@ export default function GamePage({ state, setState, tr }) {
         <Col md={7} className="d-none d-md-block">
           <Row className="row-cols-5 h-100">
             {state.lobby.selectedCards.map(card => (
-              <Col key={card.id} className="h-50">
+              <Col key={card} className="h-50">
                 <Card className="h-100">
-                  <Card.Body>{card.text}</Card.Body>
+                  <Card.Body>{tr(card)}</Card.Body>
                 </Card>
               </Col>
             ))}
@@ -106,7 +106,7 @@ export default function GamePage({ state, setState, tr }) {
   
         {/* Desktop Score Panel */}
         <Col md={3} className="flex-fill min-h-0">
-          <ScorePanel players={Object.keys(state.lobby.players)} tr={tr} />
+          <ScorePanel players={state.lobby.players} tr={tr} />
         </Col>
       </Row>
   
@@ -117,9 +117,9 @@ export default function GamePage({ state, setState, tr }) {
             <Card.Body>
               <Row className="row-cols-5">
                 {state.lobby.availableCards.map(card => (
-                  <Col key={card.id}>
-                    <Card onClick={() => onCardSelected(card.id)}>
-                      <Card.Body>{card.text}</Card.Body>
+                  <Col key={card}>
+                    <Card onClick={() => onCardSelected(card)}>
+                      <Card.Body>{tr(card)}</Card.Body>
                     </Card>
                   </Col>
                 ))}
@@ -141,9 +141,9 @@ export default function GamePage({ state, setState, tr }) {
             <div className="p-2">
               <Row className="row-cols-2 g-2">
                 {state.lobby.selectedCards.map(card => (
-                  <Col key={card.id}>
+                  <Col key={card}>
                     <Card>
-                      <Card.Body>{card.text}</Card.Body>
+                      <Card.Body>{tr(card)}</Card.Body>
                     </Card>
                   </Col>
                 ))}
@@ -154,10 +154,10 @@ export default function GamePage({ state, setState, tr }) {
           <Tab eventKey="available" title="Available">
             <div className="p-2">
               <Row className="row-cols-2 g-2">
-                {state.availableCards.map(card => (
-                  <Col key={card.id}>
-                    <Card onClick={() => onCardSelected(card.id)}>
-                      <Card.Body>{card.text}</Card.Body>
+                {state.lobby.availableCards.map(card => (
+                  <Col key={card}>
+                    <Card onClick={() => onCardSelected(card)}>
+                      <Card.Body>{tr("card")}</Card.Body>
                     </Card>
                   </Col>
                 ))}
@@ -178,7 +178,7 @@ export default function GamePage({ state, setState, tr }) {
           <Offcanvas.Title>{tr("players")}</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <ScorePanel players={Object.keys(state.lobby.players)} tr={tr} />
+          <ScorePanel players={state.lobby.players} tr={tr} />
         </Offcanvas.Body>
       </Offcanvas>
   
@@ -193,14 +193,14 @@ function ScorePanel({ players, tr }) {
         <Card.Title>{tr("players")}</Card.Title>
         <Table responsive>
           <tbody>
-            {players.map(player => (
-              <tr key={player.name} className="text-light">
+            {Object.entries(players).map(([playerName, playerData]) => (
+              <tr key={playerName} className="text-light">
                 <td width="40" className="bg-dark">
                   <BsPersonFill className="text-white" />
                 </td>
-                <td className="bg-dark text-light">{player.name}</td>
+                <td className="bg-dark text-light">{playerName}</td>
                 <td className="text-end fw-bold bg-dark text-light">
-                  {player.score}
+                  {playerData.score}
                 </td>
               </tr>
             ))}
