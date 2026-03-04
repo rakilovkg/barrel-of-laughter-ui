@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import {
   Button,
   Card,
@@ -20,54 +20,69 @@ export default function GamePage({ state, setState, tr }) {
 
   const selectCardRequest = useRequest();
 
-  const onCardSelected = async (cardId) => {
-    const newState = await selectCardRequest.send(
-      "/game/select-card",
-      "POST",
-      { cardId }
-    );
-
-    if (newState) {
-      setState(prev => ({ ...prev, ...newState }));
+  let socketRef = useRef(null);
+  const onCardSelected = async (cardIndex) => {
+    if (socketRef.current?.readyState == WebSocket.OPEN) {
+      socketRef.current.send(JSON.stringify({ type: "select_card", index: cardIndex }));
     }
   };
 
+  function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return String(minutes).padStart(2, '0') + ':' + String(remainingSeconds).padStart(2, '0');
+  }
+
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const socket = new WebSocket(`${protocol}://${process.env.WS_HOST}`);
-  
-    socket.onopen = () => {
+    const ws = new WebSocket(`${protocol}://${process.env.WS_HOST}`);
+    socketRef.current = ws;
+
+    ws.onopen = () => {
       console.log("WS connected");
     };
-  
-    socket.onmessage = (message) => {
+
+    ws.onmessage = (message) => {
       console.log("Message:", message.data);
     };
-  
-    socket.onerror = (err) => {
+
+    ws.onerror = (err) => {
       console.error("WS error:", err);
     };
-  
-    socket.onclose = () => {
+
+    ws.onclose = () => {
       console.log("WS closed");
+    };
+
+    // Countdown
+    const onSecondPassed = () => {
+      if (state.lobby.timeRemaining > 0) {
+        setState(prev => ({ ...prev, lobby: { ...prev.lobby, timeRemaining: prev.lobby.timeRemaining - 1 } }));
+        setTimeout(onSecondPassed, 1000);
+      }
+    };
+    setTimeout(onSecondPassed, 1000);
+
+    return () => {
+      ws.close(); // cleanup on unmount
     };
   }, []);
 
   return (
     <Container fluid className="game text-white h-100 d-flex flex-column">
-  
+
       {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
           <strong>Round #1 - Draft</strong>
         </div>
-  
+
         <div className="d-flex align-items-center gap-3">
           <div className="d-flex align-items-center gap-2">
             <BsClock />
-            <Badge bg="danger">00:42</Badge>
+            <Badge bg="danger">{formatTime(state.lobby.timeRemaining)}</Badge>
           </div>
-  
+
           {/* Mobile Players Button */}
           <Button
             variant="outline-light"
@@ -78,10 +93,10 @@ export default function GamePage({ state, setState, tr }) {
           </Button>
         </div>
       </div>
-  
+
       {/* MAIN CONTENT */}
       <Row className="flex-grow-1/2">
-  
+
         {/* Phrase */}
         <Col xs={12} md={2}>
           <Card className="template-card bg-light text-dark h-100">
@@ -90,7 +105,7 @@ export default function GamePage({ state, setState, tr }) {
             </Card.Body>
           </Card>
         </Col>
-  
+
         {/* Desktop Selected Cards */}
         <Col md={7} className="d-none d-md-block">
           <Row className="row-cols-5 h-100">
@@ -103,22 +118,22 @@ export default function GamePage({ state, setState, tr }) {
             ))}
           </Row>
         </Col>
-  
+
         {/* Desktop Score Panel */}
         <Col md={3} className="flex-fill min-h-0">
           <ScorePanel players={state.lobby.players} tr={tr} />
         </Col>
       </Row>
-  
+
       {/* Desktop Available Cards */}
       <Row className="d-none d-md-flex flex-fill min-h-0">
         <Col md={{ span: 7, offset: 2 }}>
           <Card className="bg-dark">
             <Card.Body>
               <Row className="row-cols-5">
-                {state.lobby.availableCards.map(card => (
+                {state.lobby.availableCards.map((card, i) => (
                   <Col key={card}>
-                    <Card onClick={() => onCardSelected(card)}>
+                    <Card onClick={() => onCardSelected(i)}>
                       <Card.Body>{tr(card)}</Card.Body>
                     </Card>
                   </Col>
@@ -128,7 +143,7 @@ export default function GamePage({ state, setState, tr }) {
           </Card>
         </Col>
       </Row>
-  
+
       {/* MOBILE BOTTOM TABS */}
       <div className="d-md-none position-fixed bottom-0 start-0 end-0 bg-dark border-top">
         <Tabs
@@ -150,7 +165,7 @@ export default function GamePage({ state, setState, tr }) {
               </Row>
             </div>
           </Tab>
-  
+
           <Tab eventKey="available" title="Available">
             <div className="p-2">
               <Row className="row-cols-2 g-2">
@@ -166,7 +181,7 @@ export default function GamePage({ state, setState, tr }) {
           </Tab>
         </Tabs>
       </div>
-  
+
       {/* MOBILE PLAYERS OFFCANVAS */}
       <Offcanvas
         show={showScores}
@@ -181,7 +196,7 @@ export default function GamePage({ state, setState, tr }) {
           <ScorePanel players={state.lobby.players} tr={tr} />
         </Offcanvas.Body>
       </Offcanvas>
-  
+
     </Container>
   );
 }
