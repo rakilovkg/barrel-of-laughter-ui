@@ -12,18 +12,15 @@ import {
   Badge
 } from "react-bootstrap";
 import { BsPersonFill, BsList, BsClock } from "react-icons/bs";
-import useRequest from "../useRequest";
 
 export default function GamePage({ state, setState, tr }) {
   const [activeTab, setActiveTab] = useState("your");
   const [showScores, setShowScores] = useState(false);
 
-  const selectCardRequest = useRequest();
-
   let socketRef = useRef(null);
   const onCardSelected = async (cardIndex) => {
     if (socketRef.current?.readyState == WebSocket.OPEN) {
-      socketRef.current.send(JSON.stringify({ type: "select_card", index: cardIndex }));
+      socketRef.current.send(JSON.stringify({ type: "player_selected_card", cardIndex }));
     }
   };
 
@@ -43,7 +40,18 @@ export default function GamePage({ state, setState, tr }) {
     };
 
     ws.onmessage = (message) => {
-      console.log("Message:", message.data);
+      const data = JSON.parse(message.data);
+      
+      switch (data.type) {
+        case "player_selected_card":
+          console.log(data);
+          setState(prev => ({ ...prev, lobby: { ...prev.lobby, selectedCards: data.selectedCards } }))
+          break;
+        case "available_cards_changed":
+          console.log(data);
+          setState(prev => ({ ...prev, lobby: { ...prev.lobby, availableCards: data.availableCards } }))
+          break;
+      }
     };
 
     ws.onerror = (err) => {
@@ -68,13 +76,15 @@ export default function GamePage({ state, setState, tr }) {
     };
   }, []);
 
+  const capitalize = (string) => string[0].toUpperCase() + string.slice(1);
+
   return (
     <Container fluid className="game text-white h-100 d-flex flex-column">
 
       {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
-          <strong>Round #1 - Draft</strong>
+          <strong>Round #1 - {capitalize(state.lobby.state)}, Host: {state.lobby.currentHost}</strong>
         </div>
 
         <div className="d-flex align-items-center gap-3">
