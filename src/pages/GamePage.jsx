@@ -39,18 +39,32 @@ export default function GamePage({ state, setState, tr }) {
       console.log("WS connected");
     };
 
+    // Countdown
+    const onSecondPassed = () => {
+      if (state.lobby.timeRemaining > 0) {
+        setState(prev => ({ ...prev, lobby: { ...prev.lobby, timeRemaining: prev.lobby.timeRemaining - 1 } }));
+        setTimeout(onSecondPassed, 1000);
+      }
+    };
+    setTimeout(onSecondPassed, 1000);
+
     ws.onmessage = (message) => {
       const data = JSON.parse(message.data);
       
       switch (data.type) {
         case "player_selected_card":
-          console.log(data);
           setState(prev => ({ ...prev, lobby: { ...prev.lobby, selectedCards: data.selectedCards } }))
           break;
         case "available_cards_changed":
-          console.log(data);
           setState(prev => ({ ...prev, lobby: { ...prev.lobby, availableCards: data.availableCards } }))
           break;
+        case "state_changed":
+          setState(prev => ({ ...prev, lobby: { ...prev.lobby, state: data.lobby.state, timeRemaining: lobby.timeRemaining, currentHost: lobby.currentHost } }));
+          if (data.lobby.state == "") {
+            // ...
+          }
+          break;
+        
       }
     };
 
@@ -61,15 +75,6 @@ export default function GamePage({ state, setState, tr }) {
     ws.onclose = () => {
       console.log("WS closed");
     };
-
-    // Countdown
-    const onSecondPassed = () => {
-      if (state.lobby.timeRemaining > 0) {
-        setState(prev => ({ ...prev, lobby: { ...prev.lobby, timeRemaining: prev.lobby.timeRemaining - 1 } }));
-        setTimeout(onSecondPassed, 1000);
-      }
-    };
-    setTimeout(onSecondPassed, 1000);
 
     return () => {
       ws.close(); // cleanup on unmount
