@@ -46,7 +46,10 @@ export default function GamePage({ state, setState, tr }) {
         setTimeout(onSecondPassed, 1000);
       }
     };
-    setTimeout(onSecondPassed, 1000);
+
+    if (state.lobby.state != "game_over") {  
+      setTimeout(onSecondPassed, 1000);
+    }
 
     ws.onmessage = (message) => {
       const data = JSON.parse(message.data);
@@ -59,9 +62,19 @@ export default function GamePage({ state, setState, tr }) {
           setState(prev => ({ ...prev, lobby: { ...prev.lobby, availableCards: data.availableCards } }))
           break;
         case "state_changed":
-          setState(prev => ({ ...prev, lobby: { ...prev.lobby, state: data.lobby.state, timeRemaining: lobby.timeRemaining, currentHost: lobby.currentHost } }));
-          if (data.lobby.state == "") {
-            // ...
+          console.log("State changed.", data);
+          setState(prev => ({ ...prev, lobby:
+            {
+              ...prev.lobby,
+              state: data.lobby.state,
+              timeRemaining: data.lobby.timeRemaining,
+              currentHost: data.lobby.currentHost,
+              selectedCards: data.lobby.selectedCards,
+            }
+          }));
+
+          if (data.lobby.state != "game_over") {
+            setTimeout(onSecondPassed, 1000);
           }
           break;
         
