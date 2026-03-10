@@ -30,6 +30,8 @@ export default function GamePage({ state, setState, tr }) {
     return String(minutes).padStart(2, '0') + ':' + String(remainingSeconds).padStart(2, '0');
   }
 
+  let timerIdRef = useRef(null);
+
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
     const ws = new WebSocket(`${protocol}://${process.env.WS_HOST}`);
@@ -41,29 +43,40 @@ export default function GamePage({ state, setState, tr }) {
 
     // Countdown
     const onSecondPassed = () => {
-      if (state.lobby.timeRemaining > 0) {
-        setState(prev => ({ ...prev, lobby: { ...prev.lobby, timeRemaining: prev.lobby.timeRemaining - 1 } }));
-        setTimeout(onSecondPassed, 1000);
-      }
+      setState(prev => {
+        if (prev.lobby.timeRemaining <= 0) return prev;
+
+        timerIdRef.current = setTimeout(onSecondPassed, 1000);
+
+        return {
+          ...prev,
+          lobby: {
+            ...prev.lobby,
+            timeRemaining: prev.lobby.timeRemaining - 1
+          }
+        };
+      });
     };
 
-    if (state.lobby.state != "game_over") {  
-      setTimeout(onSecondPassed, 1000);
+    if (state.lobby.state != "game_over") {
+      clearTimeout(timerIdRef.current);
+      timerIdRef.current = setTimeout(onSecondPassed, 1000);
     }
 
     ws.onmessage = (message) => {
       const data = JSON.parse(message.data);
-      
+
       switch (data.type) {
         case "player_selected_card":
-          setState(prev => ({ ...prev, lobby: { ...prev.lobby, selectedCards: data.selectedCards } }))
+          setState(prev => ({ ...prev, lobby: { ...prev.lobby, selectedCards: data.lobby.selectedCards } }))
           break;
         case "available_cards_changed":
-          setState(prev => ({ ...prev, lobby: { ...prev.lobby, availableCards: data.availableCards } }))
+          setState(prev => ({ ...prev, lobby: { ...prev.lobby, availableCards: data.lobby.availableCards } }))
           break;
         case "state_changed":
           console.log("State changed.", data);
-          setState(prev => ({ ...prev, lobby:
+          setState(prev => ({
+            ...prev, lobby:
             {
               ...prev.lobby,
               state: data.lobby.state,
@@ -74,10 +87,13 @@ export default function GamePage({ state, setState, tr }) {
           }));
 
           if (data.lobby.state != "game_over") {
-            setTimeout(onSecondPassed, 1000);
+            if (timerIdRef.current) {
+              clearTimeout(timerIdRef.current);
+            }
+            timerIdRef.current = setTimeout(onSecondPassed, 1000);
           }
           break;
-        
+
       }
     };
 
@@ -90,7 +106,10 @@ export default function GamePage({ state, setState, tr }) {
     };
 
     return () => {
-      ws.close(); // cleanup on unmount
+      ws.close();
+      if (timerIdRef.current) {
+        clearTimeout(timerIdRef.current);
+      }
     };
   }, []);
 
