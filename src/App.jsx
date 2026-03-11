@@ -7,8 +7,6 @@ import NameInputPage from "./pages/NameInputPage";
 import LobbyPage from "./pages/LobbyPage";
 import JoinPage from "./pages/JoinPage";
 
-import GamePage from "./pages/GamePage";
-
 import useTranslate from "./useTranslate";
 import useRequest from "./useRequest";
 

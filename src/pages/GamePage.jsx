@@ -18,9 +18,17 @@ export default function GamePage({ state, setState, tr }) {
   const [showScores, setShowScores] = useState(false);
 
   let socketRef = useRef(null);
-  const onCardSelected = async (cardIndex) => {
-    if (socketRef.current?.readyState == WebSocket.OPEN) {
+  const onAvailableCardClicked = (cardIndex) => {
+    if (state.lobby.state == "draft" && state.lobby.currentHost !== state.name) {
       socketRef.current.send(JSON.stringify({ type: "player_selected_card", cardIndex }));
+    }
+  };
+
+  const onSelectedCardClicked = (cardIndex) => {
+    console.log("Clicked selected cards");
+    if (state.lobby.state == "judging" && state.lobby.currentHost === state.name) {
+      console.log("Host attempts to pick a card...");
+      socketRef.current.send(JSON.stringify({ type: "host_selected_card", cardIndex }));
     }
   };
 
@@ -70,6 +78,10 @@ export default function GamePage({ state, setState, tr }) {
         case "player_selected_card":
           setState(prev => ({ ...prev, lobby: { ...prev.lobby, selectedCards: data.lobby.selectedCards } }))
           break;
+        case "host_selected_card":
+            setState(prev => ({ ...prev, lobby: { ...prev.lobby, players: data.lobby.players, winningCard, } }))
+            clearTimeout(timerIdRef.current);
+            break;
         case "available_cards_changed":
           setState(prev => ({ ...prev, lobby: { ...prev.lobby, availableCards: data.lobby.availableCards } }))
           break;
@@ -156,9 +168,9 @@ export default function GamePage({ state, setState, tr }) {
         {/* Desktop Selected Cards */}
         <Col md={7} className="d-none d-md-block">
           <Row className="row-cols-5 h-100">
-            {state.lobby.selectedCards.map(card => (
+            {state.lobby.selectedCards.map((card, i) => (
               <Col key={card} className="h-50">
-                <Card className="h-100">
+                <Card className="h-100" onClick={() => onSelectedCardClicked(i)}>
                   <Card.Body>{tr(card)}</Card.Body>
                 </Card>
               </Col>
@@ -180,7 +192,7 @@ export default function GamePage({ state, setState, tr }) {
               <Row className="row-cols-5">
                 {state.lobby.availableCards.map((card, i) => (
                   <Col key={card}>
-                    <Card onClick={() => onCardSelected(i)}>
+                    <Card onClick={() => onAvailableCardClicked(i)}>
                       <Card.Body>{tr(card)}</Card.Body>
                     </Card>
                   </Col>
@@ -202,9 +214,9 @@ export default function GamePage({ state, setState, tr }) {
           <Tab eventKey="your" title="Selected">
             <div className="p-2">
               <Row className="row-cols-2 g-2">
-                {state.lobby.selectedCards.map(card => (
+                {state.lobby.selectedCards.map((card, i) => (
                   <Col key={card}>
-                    <Card>
+                    <Card onClick={() => onSelectedCardClicked(i)}>
                       <Card.Body>{tr(card)}</Card.Body>
                     </Card>
                   </Col>
@@ -218,7 +230,7 @@ export default function GamePage({ state, setState, tr }) {
               <Row className="row-cols-2 g-2">
                 {state.lobby.availableCards.map(card => (
                   <Col key={card}>
-                    <Card onClick={() => onCardSelected(card)}>
+                    <Card onClick={() => onAvailableCardClicked(card)}>
                       <Card.Body>{tr("card")}</Card.Body>
                     </Card>
                   </Col>
