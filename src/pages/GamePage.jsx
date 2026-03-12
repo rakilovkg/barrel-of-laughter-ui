@@ -79,9 +79,10 @@ export default function GamePage({ state, setState, tr }) {
           setState(prev => ({ ...prev, lobby: { ...prev.lobby, selectedCards: data.lobby.selectedCards } }))
           break;
         case "host_selected_card":
-            setState(prev => ({ ...prev, lobby: { ...prev.lobby, players: data.lobby.players, winningCard, } }))
-            clearTimeout(timerIdRef.current);
-            break;
+          console.log(data);
+          setState(prev => ({ ...prev, lobby: { ...prev.lobby, players: data.lobby.players, winningCardIndex: data.lobby.winningCardIndex, } }))
+          clearTimeout(timerIdRef.current);
+          break;
         case "available_cards_changed":
           setState(prev => ({ ...prev, lobby: { ...prev.lobby, availableCards: data.lobby.availableCards } }))
           break;
@@ -170,7 +171,10 @@ export default function GamePage({ state, setState, tr }) {
           <Row className="row-cols-5 h-100">
             {state.lobby.selectedCards.map((card, i) => (
               <Col key={card} className="h-50">
-                <Card className="h-100" onClick={() => onSelectedCardClicked(i)}>
+                <Card
+                  className={`h-100 ${state.lobby.winningCardIndex === i ? "border border-3 border-success" : ""}`}
+                  onClick={() => onSelectedCardClicked(i)}
+                >
                   <Card.Body>{tr(card)}</Card.Body>
                 </Card>
               </Col>
@@ -216,7 +220,10 @@ export default function GamePage({ state, setState, tr }) {
               <Row className="row-cols-2 g-2">
                 {state.lobby.selectedCards.map((card, i) => (
                   <Col key={card}>
-                    <Card onClick={() => onSelectedCardClicked(i)}>
+                    <Card
+                      className={`h-100 ${state.lobby.winningCardIndex === i ? "border border-3 border-success" : ""}`}
+                      onClick={() => onSelectedCardClicked(i)}
+                    >
                       <Card.Body>{tr(card)}</Card.Body>
                     </Card>
                   </Col>
