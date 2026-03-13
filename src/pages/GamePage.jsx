@@ -25,9 +25,7 @@ export default function GamePage({ state, setState, tr }) {
   };
 
   const onSelectedCardClicked = (cardIndex) => {
-    console.log("Clicked selected cards");
     if (state.lobby.state == "judging" && state.lobby.currentHost === state.name) {
-      console.log("Host attempts to pick a card...");
       socketRef.current.send(JSON.stringify({ type: "host_selected_card", cardIndex }));
     }
   };
@@ -75,6 +73,9 @@ export default function GamePage({ state, setState, tr }) {
       const data = JSON.parse(message.data);
 
       switch (data.type) {
+        case "draft_started":
+          /* state.lobby.winningCardIndex = -1 */
+          break;
         case "player_selected_card":
           setState(prev => ({ ...prev, lobby: { ...prev.lobby, selectedCards: data.lobby.selectedCards } }))
           break;
