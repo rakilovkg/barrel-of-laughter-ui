@@ -37,6 +37,9 @@ export default function GamePage({ state, setState, tr }) {
   }
 
   let timerIdRef = useRef(null);
+  useEffect(() => {
+    console.log(`Timer changed: ${state.lobby.timeRemaining}`);
+  }, [state.lobby.timeRemaining]);
 
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
@@ -74,18 +77,17 @@ export default function GamePage({ state, setState, tr }) {
 
       switch (data.type) {
         case "draft_started":
-          /* state.lobby.winningCardIndex = -1 */
+          state.lobby.winningCardIndex = -1;
           break;
         case "player_selected_card":
-          setState(prev => ({ ...prev, lobby: { ...prev.lobby, selectedCards: data.lobby.selectedCards } }))
+          setState(prev => ({ ...prev, lobby: { ...prev.lobby, selectedCards: data.lobby.selectedCards } }));
           break;
-        case "host_selected_card":
-          console.log(data);
-          setState(prev => ({ ...prev, lobby: { ...prev.lobby, players: data.lobby.players, winningCardIndex: data.lobby.winningCardIndex, } }))
+        case "winning_card_selected":
+          setState(prev => ({ ...prev, lobby: { ...prev.lobby, players: data.lobby.players, winningCardIndex: data.lobby.winningCardIndex, } }));
           clearTimeout(timerIdRef.current);
           break;
         case "available_cards_changed":
-          setState(prev => ({ ...prev, lobby: { ...prev.lobby, availableCards: data.lobby.availableCards } }))
+          setState(prev => ({ ...prev, lobby: { ...prev.lobby, availableCards: data.lobby.availableCards } }));
           break;
         case "state_changed":
           console.log("State changed.", data);
