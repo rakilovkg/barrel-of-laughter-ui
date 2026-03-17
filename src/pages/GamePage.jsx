@@ -74,23 +74,38 @@ export default function GamePage({ state, setState, tr }) {
 
     ws.onmessage = (message) => {
       const data = JSON.parse(message.data);
+      setState(previous => ({ ...previous, ...data }));
 
+      /*
       switch (data.type) {
-        case "draft_started":
-          state.lobby.winningCardIndex = -1;
+        case "game_initialized":
+          
           break;
         case "player_selected_card":
           setState(prev => ({ ...prev, lobby: { ...prev.lobby, selectedCards: data.lobby.selectedCards } }));
+          break;
+        case "moved_to_judging_state":
+          setState(prev => ({
+            ...prev, lobby:
+            {
+              ...prev.lobby,
+              state: data.lobby.state,
+              timeRemaining: data.lobby.timeRemaining,
+              selectedCards: data.lobby.selectedCards,
+            }
+          }));
           break;
         case "winning_card_selected":
           setState(prev => ({ ...prev, lobby: { ...prev.lobby, players: data.lobby.players, winningCardIndex: data.lobby.winningCardIndex, } }));
           clearTimeout(timerIdRef.current);
           break;
+        case "draft_started":
+          state.lobby.winningCardIndex = -1;
+          break;
         case "available_cards_changed":
           setState(prev => ({ ...prev, lobby: { ...prev.lobby, availableCards: data.lobby.availableCards } }));
           break;
         case "state_changed":
-          console.log("State changed.", data);
           setState(prev => ({
             ...prev, lobby:
             {
@@ -111,6 +126,7 @@ export default function GamePage({ state, setState, tr }) {
           break;
 
       }
+      */
     };
 
     ws.onerror = (err) => {
