@@ -26,7 +26,7 @@ export default function GamePage({ state, setState, tr }) {
 
   const onSelectedCardClicked = (cardIndex) => {
     if (state.lobby.state == "judging" && state.lobby.currentHost === state.name) {
-      socketRef.current.send(JSON.stringify({ type: "host_selected_card", cardIndex }));
+      socketRef.current.send(JSON.stringify({ type: "winning_card_selected", cardIndex }));
     }
   };
 
@@ -108,7 +108,7 @@ export default function GamePage({ state, setState, tr }) {
       {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
-          <strong>Round #1 - {capitalize(state.lobby.state)}, Host: {state.lobby.currentHost}</strong>
+          <strong>Round #{state.lobby.round} - {capitalize(state.lobby.state)}, Host: {state.lobby.currentHost}</strong>
         </div>
 
         <div className="d-flex align-items-center gap-3">
@@ -158,7 +158,7 @@ export default function GamePage({ state, setState, tr }) {
 
         {/* Desktop Score Panel */}
         <Col md={3} className="flex-fill min-h-0">
-          <ScorePanel players={state.lobby.players} tr={tr} />
+          <ScorePanel players={state.lobby.players} tr={tr} winnerName={state.lobby.winnerName} />
         </Col>
       </Row>
 
@@ -233,7 +233,7 @@ export default function GamePage({ state, setState, tr }) {
           <Offcanvas.Title>{tr("players")}</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <ScorePanel players={state.lobby.players} tr={tr} />
+          <ScorePanel players={state.lobby.players} tr={tr} winnerName={state.lobby.winnerName} />
         </Offcanvas.Body>
       </Offcanvas>
 
@@ -241,7 +241,7 @@ export default function GamePage({ state, setState, tr }) {
   );
 }
 
-function ScorePanel({ players, tr }) {
+function ScorePanel({ players, tr, winnerName }) {
   return (
     <Card className="h-100 bg-dark">
       <Card.Body>
@@ -249,7 +249,7 @@ function ScorePanel({ players, tr }) {
         <Table responsive>
           <tbody>
             {Object.entries(players).map(([playerName, playerData]) => (
-              <tr key={playerName} className="text-light">
+              <tr key={playerName} className={ "text-light" + (winnerName == playerName ? "" : "") }>
                 <td width="40" className="bg-dark">
                   <BsPersonFill className="text-white" />
                 </td>
