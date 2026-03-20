@@ -37,9 +37,6 @@ export default function GamePage({ state, setState, tr }) {
   }
 
   let timerIdRef = useRef(null);
-  useEffect(() => {
-    console.log(`Timer changed: ${state.lobby.timeRemaining}`);
-  }, [state.lobby.timeRemaining]);
 
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
@@ -53,7 +50,12 @@ export default function GamePage({ state, setState, tr }) {
     // Countdown
     const onSecondPassed = () => {
       setState(prev => {
-        if (prev.lobby.timeRemaining <= 0) return prev;
+        if (prev.lobby.timeRemaining <= 0) {
+          if (timerIdRef.current) {
+            clearTimeout(timerIdRef.current);
+          }
+          return prev;
+        }
 
         timerIdRef.current = setTimeout(onSecondPassed, 1000);
 
@@ -80,7 +82,7 @@ export default function GamePage({ state, setState, tr }) {
 
       if (data.lobby.newTimeRemaining) {
         clearTimeout(timerIdRef.current);
-        setTimeout(onSecondPassed, 1000);
+        timerIdRef.current = setTimeout(onSecondPassed, 1000);
       }
     };
 
@@ -249,7 +251,7 @@ function ScorePanel({ players, tr, winnerName }) {
         <Table responsive>
           <tbody>
             {Object.entries(players).map(([playerName, playerData]) => (
-              <tr key={playerName} className={ "text-light" + (winnerName == playerName ? "" : "") }>
+              <tr key={playerName} className={ `text-light ${(winnerName == playerName ? "border border-3 border-success" : "")}` }>
                 <td width="40" className="bg-dark">
                   <BsPersonFill className="text-white" />
                 </td>
