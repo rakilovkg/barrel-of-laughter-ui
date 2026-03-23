@@ -80,7 +80,7 @@ export default function GamePage({ state, setState, tr }) {
 
       setState(prev => ({ ...prev, lobby: { ...prev.lobby, ...data.lobby } }));
 
-      if (data.lobby.newTimeRemaining) {
+      if (data.lobby.timeRemaining) {
         clearTimeout(timerIdRef.current);
         timerIdRef.current = setTimeout(onSecondPassed, 1000);
       }
