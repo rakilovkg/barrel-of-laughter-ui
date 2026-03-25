@@ -12,6 +12,7 @@ import {
   Badge
 } from "react-bootstrap";
 import { BsPersonFill, BsList, BsClock } from "react-icons/bs";
+import GameOver from "../components/GameOver";
 
 export default function GamePage({ state, setState, tr }) {
   const [activeTab, setActiveTab] = useState("your");
@@ -69,7 +70,9 @@ export default function GamePage({ state, setState, tr }) {
       });
     };
 
-    if (state.lobby.state != "game_over") {
+    if (true /* state.lobby.state == "game_over" */) {
+      return <GameOver />;
+    } else {
       clearTimeout(timerIdRef.current);
       timerIdRef.current = setTimeout(onSecondPassed, 1000);
     }
