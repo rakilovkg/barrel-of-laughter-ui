@@ -26,6 +26,12 @@ export default {
     "lobby_required": "You haven't created any lobbies.",
     "not_enough_players": "Not enough players. At least 3 is required in a lobby.",
 
+    "game_over": "Game Over",
+    "winner": "The winner is ",
+    "winners": "The winners are: ",
+    "play_again": "Play Again",
+    "back_to_lobby": "Back To Lobby",
+
     "enter_room": "I enter the room. ___ is in the room. I leave the room.",
     "yar_har_har": "Yar har har and ___!",
     "party_slogan": "Our party's slogan: ___ into the masses!",
@@ -188,6 +194,11 @@ export default {
     "lobby_required": "Ви не створили жодного лоббі.",
     "not_enough_players": "Недостатньо гравці. Треба принаймі 3 у лоббі.",
 
+    "game_over": "Кінець Гри",
+    "winner": "Переможець - ",
+    "winners": "Переможці: ",
+    "play_again": "Грати Знову",
+    "back_to_lobby": "Назад у лоббі",
 
     "enter_room": "Я заходжу до кімнати. ___ у кімнаті. Я виходжу з кімнати.",
     "yar_har_har": "Йо-хо-хо і ___!",

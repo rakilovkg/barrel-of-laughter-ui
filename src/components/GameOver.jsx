@@ -2,22 +2,26 @@ import React from "react";
 
 import { Container, Card, Button } from "react-bootstrap";
 
-const GameOver = () => {
-    const winners = ["John Smith"];
+import useRequest from "../useRequest";
+
+const GameOver = ({ winners, tr }) => {
+    const playAgainRequest = useRequest();
+    const backToLobbyRequest = useRequest();
+
     return (
         <Container className="d-flex justify-content-center">
-            <Card style={{ width: '18rem' }}>
+            <Card style={{ width: '22rem' }}>
                 <Card.Body>
-                    <Card.Title>Game Over</Card.Title>
+                    <Card.Title>{tr("game_over")}</Card.Title>
                     <Card.Text>
                         {
                           winners.length == 1 ?
-                            `The winner is ${winners[0]}.` :
-                            `The winners are: ${winners.join(", ")}`
+                            `${tr("winner")} ${winners[0]}.` :
+                            `${tr("winners")} ${winners.join(", ")}.`
                         }
                     </Card.Text>
-                    <Button variant="primary" className="me-3">Play Again</Button>
-                    <Button variant="danger">Back To Lobby</Button>
+                    <Button variant="primary" className="me-3">{tr("play_again")}</Button>
+                    <Button variant="danger">{tr("back_to_lobby")}</Button>
                 </Card.Body>
             </Card>
         </Container>

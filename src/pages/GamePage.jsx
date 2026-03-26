@@ -39,6 +39,10 @@ export default function GamePage({ state, setState, tr }) {
 
   let timerIdRef = useRef(null);
 
+  if (state.lobby.state == "game_over") {
+    return <GameOver winners={state.lobby.winners} tr={tr} />;
+  }
+
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
     const ws = new WebSocket(`${protocol}://${process.env.WS_HOST}`);
@@ -69,13 +73,13 @@ export default function GamePage({ state, setState, tr }) {
         };
       });
     };
-
-    if (true /* state.lobby.state == "game_over" */) {
-      return <GameOver />;
-    } else {
+    
+    /*
+    if (state.lobby.state != "game_over") {
       clearTimeout(timerIdRef.current);
       timerIdRef.current = setTimeout(onSecondPassed, 1000);
     }
+    */
 
     ws.onmessage = (message) => {
       const data = JSON.parse(message.data);

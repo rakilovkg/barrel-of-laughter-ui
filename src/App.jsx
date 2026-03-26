@@ -3,8 +3,6 @@ import PlayerContext from "./PlayerContext";
 
 import Header from "./components/Header";
 
-import GameOver from "./components/GameOver";
-
 import NameInputPage from "./pages/NameInputPage";
 import LobbyPage from "./pages/LobbyPage";
 import JoinPage from "./pages/JoinPage";
@@ -54,7 +52,7 @@ export default function App() {
       <div className="h-100 d-flex flex-column bg-dark">
         <Header />
         <div className="flex-grow-1 p-4">
-          <GameOver />{ /*gameContainer*/ }
+          { gameContainer }
         </div>
       </div>
     </PlayerContext.Provider>
