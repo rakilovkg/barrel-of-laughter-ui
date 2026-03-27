@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Button,
   Card,
@@ -12,6 +12,7 @@ import {
   Badge
 } from "react-bootstrap";
 import { BsPersonFill, BsList, BsClock } from "react-icons/bs";
+
 import GameOver from "../components/GameOver";
 
 export default function GamePage({ state, setState, tr }) {
@@ -39,18 +40,10 @@ export default function GamePage({ state, setState, tr }) {
 
   let timerIdRef = useRef(null);
 
-  if (state.lobby.state == "game_over") {
-    return <GameOver winners={state.lobby.winners} tr={tr} />;
-  }
-
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
     const ws = new WebSocket(`${protocol}://${process.env.WS_HOST}`);
     socketRef.current = ws;
-
-    ws.onopen = () => {
-      console.log("WS connected");
-    };
 
     // Countdown
     const onSecondPassed = () => {
@@ -73,17 +66,9 @@ export default function GamePage({ state, setState, tr }) {
         };
       });
     };
-    
-    /*
-    if (state.lobby.state != "game_over") {
-      clearTimeout(timerIdRef.current);
-      timerIdRef.current = setTimeout(onSecondPassed, 1000);
-    }
-    */
 
     ws.onmessage = (message) => {
       const data = JSON.parse(message.data);
-      console.log(data);
 
       setState(prev => ({ ...prev, lobby: { ...prev.lobby, ...data.lobby } }));
 
@@ -91,14 +76,6 @@ export default function GamePage({ state, setState, tr }) {
         clearTimeout(timerIdRef.current);
         timerIdRef.current = setTimeout(onSecondPassed, 1000);
       }
-    };
-
-    ws.onerror = (err) => {
-      console.error("WS error:", err);
-    };
-
-    ws.onclose = () => {
-      console.log("WS closed");
     };
 
     return () => {
@@ -113,6 +90,11 @@ export default function GamePage({ state, setState, tr }) {
 
   return (
     <Container fluid className="game text-white h-100 d-flex flex-column">
+      
+      {
+        state.lobby.state === "game_over" &&
+          <GameOver winners={state.lobby.winners} tr={tr} />
+      }
 
       {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -155,10 +137,10 @@ export default function GamePage({ state, setState, tr }) {
             {state.lobby.selectedCards.map((card, i) => (
               <Col key={card} className="h-50">
                 <Card
-                  className={`h-100 ${state.lobby.winningCardIndex === i ? "border border-3 border-success" : ""}`}
+                  className={`h-100 ${state.lobby.winningCardIndex === i ? "outline-success" : ""}`}
                   onClick={() => onSelectedCardClicked(i)}
                 >
-                  <Card.Body>{tr(card)}</Card.Body>
+                  <Card.Body className="small">{tr(card)}</Card.Body>
                 </Card>
               </Col>
             ))}
@@ -180,7 +162,7 @@ export default function GamePage({ state, setState, tr }) {
                 {state.lobby.availableCards.map((card, i) => (
                   <Col key={card}>
                     <Card onClick={() => onAvailableCardClicked(i)}>
-                      <Card.Body>{tr(card)}</Card.Body>
+                      <Card.Body className="small">{tr(card)}</Card.Body>
                     </Card>
                   </Col>
                 ))}
@@ -200,14 +182,14 @@ export default function GamePage({ state, setState, tr }) {
         >
           <Tab eventKey="your" title="Selected">
             <div className="p-2">
-              <Row className="row-cols-2 g-2">
+              <Row className="h-50 row-cols-2 g-2">
                 {state.lobby.selectedCards.map((card, i) => (
                   <Col key={card}>
                     <Card
-                      className={`h-100 ${state.lobby.winningCardIndex === i ? "border border-3 border-success" : ""}`}
+                      className={`h-100 ${state.lobby.winningCardIndex === i ? "outline-success" : ""}`}
                       onClick={() => onSelectedCardClicked(i)}
                     >
-                      <Card.Body>{tr(card)}</Card.Body>
+                      <Card.Body className="small">{tr(card)}</Card.Body>
                     </Card>
                   </Col>
                 ))}
@@ -221,7 +203,7 @@ export default function GamePage({ state, setState, tr }) {
                 {state.lobby.availableCards.map(card => (
                   <Col key={card}>
                     <Card onClick={() => onAvailableCardClicked(card)}>
-                      <Card.Body>{tr("card")}</Card.Body>
+                      <Card.Body className="small">{tr("card")}</Card.Body>
                     </Card>
                   </Col>
                 ))}
@@ -258,7 +240,7 @@ function ScorePanel({ players, tr, winnerName }) {
         <Table responsive>
           <tbody>
             {Object.entries(players).map(([playerName, playerData]) => (
-              <tr key={playerName} className={ `text-light ${(winnerName == playerName ? "border border-3 border-success" : "")}` }>
+              <tr key={playerName} className={ `text-light ${(winnerName == playerName ? "outline-success" : "")}` }>
                 <td width="40" className="bg-dark">
                   <BsPersonFill className="text-white" />
                 </td>
