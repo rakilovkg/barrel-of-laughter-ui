@@ -90,10 +90,10 @@ export default function GamePage({ state, setState, tr }) {
 
   return (
     <Container fluid className="game text-white h-100 d-flex flex-column">
-      
+
       {
         state.lobby.state === "game_over" &&
-          <GameOver winners={state.lobby.winners} tr={tr} />
+        <GameOver winners={state.lobby.winners} tr={tr} />
       }
 
       {/* HEADER */}
@@ -120,8 +120,7 @@ export default function GamePage({ state, setState, tr }) {
       </div>
 
       {/* MAIN CONTENT */}
-      <Row className="flex-grow-1/2">
-
+      <Row>
         {/* Phrase */}
         <Col xs={12} md={2}>
           <Card className="template-card bg-light text-dark h-100">
@@ -131,9 +130,10 @@ export default function GamePage({ state, setState, tr }) {
           </Card>
         </Col>
 
-        {/* Desktop Selected Cards */}
+        {/* Selected And Available Cards */}
         <Col md={7} className="d-none d-md-block">
-          <Row className="row-cols-5 h-100">
+
+          <Row className="row-cols-5">
             {state.lobby.selectedCards.map((card, i) => (
               <Col key={card} className="h-50">
                 <Card
@@ -145,34 +145,32 @@ export default function GamePage({ state, setState, tr }) {
               </Col>
             ))}
           </Row>
+
+          <Row className="row-cols-5">
+            <Card className="bg-dark">
+              <Card.Body>
+                <Row className="row-cols-5">
+                  {state.lobby.availableCards.map((card, i) => (
+                    <Col key={card}>
+                      <Card onClick={() => onAvailableCardClicked(i)}>
+                        <Card.Body className="small">{tr(card)}</Card.Body>
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+              </Card.Body>
+            </Card>
+          </Row>
+
         </Col>
 
         {/* Desktop Score Panel */}
-        <Col md={3} className="flex-fill min-h-0">
+        <Col md={3} className="d-none d-md-flex flex-fill h-100">
           <ScorePanel players={state.lobby.players} tr={tr} winnerName={state.lobby.winnerName} />
         </Col>
       </Row>
 
-      {/* Desktop Available Cards */}
-      <Row className="d-none d-md-flex flex-fill min-h-0">
-        <Col md={{ span: 7, offset: 2 }}>
-          <Card className="bg-dark">
-            <Card.Body>
-              <Row className="row-cols-5">
-                {state.lobby.availableCards.map((card, i) => (
-                  <Col key={card}>
-                    <Card onClick={() => onAvailableCardClicked(i)}>
-                      <Card.Body className="small">{tr(card)}</Card.Body>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* MOBILE BOTTOM TABS */}
+      {/* Mobile Bottom Tabs */}
       <div className="d-md-none position-fixed bottom-0 start-0 end-0 bg-dark border-top">
         <Tabs
           activeKey={activeTab}
@@ -203,7 +201,7 @@ export default function GamePage({ state, setState, tr }) {
                 {state.lobby.availableCards.map(card => (
                   <Col key={card}>
                     <Card onClick={() => onAvailableCardClicked(card)}>
-                      <Card.Body className="small">{tr("card")}</Card.Body>
+                      <Card.Body className="small">{tr(card)}</Card.Body>
                     </Card>
                   </Col>
                 ))}
@@ -234,13 +232,13 @@ export default function GamePage({ state, setState, tr }) {
 
 function ScorePanel({ players, tr, winnerName }) {
   return (
-    <Card className="h-100 bg-dark">
+    <Card className="w-100 h-100 bg-dark">
       <Card.Body>
         <Card.Title>{tr("players")}</Card.Title>
         <Table responsive>
           <tbody>
             {Object.entries(players).map(([playerName, playerData]) => (
-              <tr key={playerName} className={ `text-light ${(winnerName == playerName ? "outline-success" : "")}` }>
+              <tr key={playerName} className={`text-light ${(winnerName == playerName ? "outline-success" : "")}`}>
                 <td width="40" className="bg-dark">
                   <BsPersonFill className="text-white" />
                 </td>
