@@ -120,10 +120,10 @@ export default function GamePage({ state, setState, tr }) {
       </div>
 
       {/* MAIN CONTENT */}
-      <Row>
+      <Row className="h-100">
         {/* Phrase */}
         <Col xs={12} md={2}>
-          <Card className="template-card bg-light text-dark h-100">
+          <Card className="h-50 template-card bg-light text-dark">
             <Card.Body>
               {tr(state.lobby.currentPhrase)}
             </Card.Body>
@@ -133,11 +133,11 @@ export default function GamePage({ state, setState, tr }) {
         {/* Selected And Available Cards */}
         <Col md={7} className="d-none d-md-block">
 
-          <Row className="row-cols-5">
+          <Row className="h-50 row-cols-5">
             {state.lobby.selectedCards.map((card, i) => (
-              <Col key={card} className="h-50">
+              <Col key={card}>
                 <Card
-                  className={`h-100 ${state.lobby.winningCardIndex === i ? "outline-success" : ""}`}
+                  className={`${state.lobby.winningCardIndex === i ? "outline-success" : ""}`}
                   onClick={() => onSelectedCardClicked(i)}
                 >
                   <Card.Body className="small">{tr(card)}</Card.Body>
@@ -146,8 +146,8 @@ export default function GamePage({ state, setState, tr }) {
             ))}
           </Row>
 
-          <Row className="row-cols-5">
-            <Card className="bg-dark">
+          <Row className="h-50">
+            <Card className="w-100 bg-dark">
               <Card.Body>
                 <Row className="row-cols-5">
                   {state.lobby.availableCards.map((card, i) => (
@@ -165,7 +165,7 @@ export default function GamePage({ state, setState, tr }) {
         </Col>
 
         {/* Desktop Score Panel */}
-        <Col md={3} className="d-none d-md-flex flex-fill h-100">
+        <Col md={3}>
           <ScorePanel players={state.lobby.players} tr={tr} winnerName={state.lobby.winnerName} />
         </Col>
       </Row>
@@ -232,7 +232,7 @@ export default function GamePage({ state, setState, tr }) {
 
 function ScorePanel({ players, tr, winnerName }) {
   return (
-    <Card className="w-100 h-100 bg-dark">
+    <Card className="w-100 bg-dark">
       <Card.Body>
         <Card.Title>{tr("players")}</Card.Title>
         <Table responsive>
