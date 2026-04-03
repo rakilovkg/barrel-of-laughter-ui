@@ -89,7 +89,7 @@ export default function GamePage({ state, setState, tr }) {
   const capitalize = (string) => string[0].toUpperCase() + string.slice(1);
 
   return (
-    <Container fluid className="game text-white h-100 d-flex flex-column">
+    <Container fluid className="game text-white d-flex flex-column h-100">
 
       {
         state.lobby.state === "game_over" &&
@@ -120,10 +120,10 @@ export default function GamePage({ state, setState, tr }) {
       </div>
 
       {/* MAIN CONTENT */}
-      <Row className="h-100">
+      <Row className="flex-grow-1">
         {/* Phrase */}
-        <Col xs={12} md={2}>
-          <Card className="h-50 template-card bg-light text-dark">
+        <Col sm={2} md={2}>
+          <Card className="template-card bg-light text-dark">
             <Card.Body>
               {tr(state.lobby.currentPhrase)}
             </Card.Body>
@@ -131,36 +131,30 @@ export default function GamePage({ state, setState, tr }) {
         </Col>
 
         {/* Selected And Available Cards */}
-        <Col md={7} className="d-none d-md-block">
+        <Col
+          md={7}
+          className="d-none d-md-flex flex-column h-100"
+        >
 
-          <Row className="h-50 row-cols-5">
-            {state.lobby.selectedCards.map((card, i) => (
-              <Col key={card}>
-                <Card
-                  className={`${state.lobby.winningCardIndex === i ? "outline-success" : ""}`}
-                  onClick={() => onSelectedCardClicked(i)}
-                >
-                  <Card.Body className="small">{tr(card)}</Card.Body>
+          <div className="card-grid">
+            {state.lobby.selectedCards.map((card) => (
+                <Card key={card} className="flex-fill d-flex">
+                  <Card.Body className="small d-flex align-items-center justify-content-center text-center">
+                    {tr(card)}
+                  </Card.Body>
                 </Card>
-              </Col>
             ))}
-          </Row>
+          </div>
 
-          <Row className="h-50">
-            <Card className="w-100 bg-dark">
-              <Card.Body>
-                <Row className="row-cols-5">
-                  {state.lobby.availableCards.map((card, i) => (
-                    <Col key={card}>
-                      <Card onClick={() => onAvailableCardClicked(i)}>
-                        <Card.Body className="small">{tr(card)}</Card.Body>
-                      </Card>
-                    </Col>
-                  ))}
-                </Row>
-              </Card.Body>
-            </Card>
-          </Row>
+          <div className="card-grid rounded p-2" style={{ outline: "2px solid white" }}>
+            {state.lobby.availableCards.map((card) => (
+                <Card key={card} className="flex-fill d-flex">
+                  <Card.Body className="small d-flex align-items-center justify-content-center text-center">
+                    {tr(card)}
+                  </Card.Body>
+                </Card>
+            ))}
+          </div>
 
         </Col>
 
@@ -171,6 +165,7 @@ export default function GamePage({ state, setState, tr }) {
       </Row>
 
       {/* Mobile Bottom Tabs */}
+
       <div className="d-md-none position-fixed bottom-0 start-0 end-0 bg-dark border-top">
         <Tabs
           activeKey={activeTab}
@@ -180,11 +175,11 @@ export default function GamePage({ state, setState, tr }) {
         >
           <Tab eventKey="your" title="Selected">
             <div className="p-2">
-              <Row className="h-50 row-cols-2 g-2">
+              <Row className="row-cols-2 g-2">
                 {state.lobby.selectedCards.map((card, i) => (
                   <Col key={card}>
                     <Card
-                      className={`h-100 ${state.lobby.winningCardIndex === i ? "outline-success" : ""}`}
+                      className={`${state.lobby.winningCardIndex === i ? "outline-success" : ""}`}
                       onClick={() => onSelectedCardClicked(i)}
                     >
                       <Card.Body className="small">{tr(card)}</Card.Body>
@@ -232,7 +227,7 @@ export default function GamePage({ state, setState, tr }) {
 
 function ScorePanel({ players, tr, winnerName }) {
   return (
-    <Card className="w-100 bg-dark">
+    <Card className="d-none d-md-flex w-100 bg-dark d-flex flex-fill">
       <Card.Body>
         <Card.Title>{tr("players")}</Card.Title>
         <Table responsive>
