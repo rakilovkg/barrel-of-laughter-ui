@@ -120,7 +120,7 @@ export default function GamePage({ state, setState, tr }) {
       </div>
 
       {/* MAIN CONTENT */}
-      <Row className="flex-grow-1">
+      <Row>
         {/* Phrase */}
         <Col sm={2} md={2}>
           <Card className="template-card bg-light text-dark">
@@ -138,75 +138,61 @@ export default function GamePage({ state, setState, tr }) {
 
           <div className="card-grid">
             {state.lobby.selectedCards.map((card) => (
-                <Card key={card} className="flex-fill d-flex">
-                  <Card.Body className="small d-flex align-items-center justify-content-center text-center">
-                    {tr(card)}
-                  </Card.Body>
-                </Card>
+              <Card key={card} className="flex-fill d-flex">
+                <Card.Body className="small d-flex align-items-center justify-content-center text-center">
+                  {tr(card)}
+                </Card.Body>
+              </Card>
             ))}
           </div>
 
           <div className="card-grid rounded p-2" style={{ outline: "2px solid white" }}>
             {state.lobby.availableCards.map((card) => (
-                <Card key={card} className="flex-fill d-flex">
-                  <Card.Body className="small d-flex align-items-center justify-content-center text-center">
-                    {tr(card)}
-                  </Card.Body>
-                </Card>
+              <Card key={card} className="flex-fill d-flex">
+                <Card.Body className="small d-flex align-items-center justify-content-center text-center">
+                  {tr(card)}
+                </Card.Body>
+              </Card>
             ))}
           </div>
 
         </Col>
 
         {/* Desktop Score Panel */}
-        <Col md={3}>
+        <Col md={3} className="d-none d-md-block">
           <ScorePanel players={state.lobby.players} tr={tr} winnerName={state.lobby.winnerName} />
         </Col>
       </Row>
 
-      {/* Mobile Bottom Tabs */}
 
-      <div className="d-md-none position-fixed bottom-0 start-0 end-0 bg-dark border-top">
-        <Tabs
-          activeKey={activeTab}
-          onSelect={(k) => setActiveTab(k)}
-          className="mb-0"
-          fill
-        >
-          <Tab eventKey="your" title="Selected">
-            <div className="p-2">
-              <Row className="row-cols-2 g-2">
-                {state.lobby.selectedCards.map((card, i) => (
-                  <Col key={card}>
-                    <Card
-                      className={`${state.lobby.winningCardIndex === i ? "outline-success" : ""}`}
-                      onClick={() => onSelectedCardClicked(i)}
-                    >
-                      <Card.Body className="small">{tr(card)}</Card.Body>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            </div>
-          </Tab>
-
-          <Tab eventKey="available" title="Available">
-            <div className="p-2">
-              <Row className="row-cols-2 g-2">
-                {state.lobby.availableCards.map(card => (
-                  <Col key={card}>
-                    <Card onClick={() => onAvailableCardClicked(card)}>
-                      <Card.Body className="small">{tr(card)}</Card.Body>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            </div>
-          </Tab>
-        </Tabs>
+      { /* MOBILE */}
+      <div className="d-md-none card-grid-mobile p-2" style={{ height: "20em", fontSize: "0.85em" }}>
+        {
+          state.lobby.selectedCards.map((card, i) => (
+            <Card
+              className={`${state.lobby.winningCardIndex === i ? "outline-success" : ""}`}
+              onClick={() => onSelectedCardClicked(i)}
+            >
+              <Card.Body className="small">{tr(card)}</Card.Body>
+            </Card>
+          ))
+        }
       </div>
 
-      {/* MOBILE PLAYERS OFFCANVAS */}
+
+      <div className="d-md-none card-grid-mobile p-2" style={{ height: "20em", fontSize: "0.85em" }}>
+
+        {
+          state.lobby.availableCards.map(card => (
+            <Card onClick={() => onAvailableCardClicked(card)}>
+              <Card.Body className="small">{tr(card)}</Card.Body>
+            </Card>
+          ))
+        }
+
+      </div>
+
+
       <Offcanvas
         show={showScores}
         onHide={() => setShowScores(false)}
@@ -221,13 +207,14 @@ export default function GamePage({ state, setState, tr }) {
         </Offcanvas.Body>
       </Offcanvas>
 
+
     </Container>
   );
 }
 
 function ScorePanel({ players, tr, winnerName }) {
   return (
-    <Card className="d-none d-md-flex w-100 bg-dark d-flex flex-fill">
+    <Card className="w-100 bg-dark d-flex flex-fill">
       <Card.Body>
         <Card.Title>{tr("players")}</Card.Title>
         <Table responsive>
@@ -235,7 +222,7 @@ function ScorePanel({ players, tr, winnerName }) {
             {Object.entries(players).map(([playerName, playerData]) => (
               <tr key={playerName} className={`text-light ${(winnerName == playerName ? "outline-success" : "")}`}>
                 <td width="40" className="bg-dark">
-                  <BsPersonFill className="text-white" />
+                  <BsPersonFill className="text-light" />
                 </td>
                 <td className="bg-dark text-light">{playerName}</td>
                 <td className="text-end fw-bold bg-dark text-light">
