@@ -1,0 +1,85 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  color: white;
+  font-family: Arial, Helvetica, Calibri, sans-serif;
+}
+
+.lobby-dashboard {
+  padding: 1em;
+  background-color: #000C24;
+  max-height: 100%;
+}
+
+.lobby-players {
+  display: none;
+  min-height: 300px;
+  flex-grow: 0;
+}
+
+/* Desktop */
+@media (min-width: 700px) {
+  .input-group {
+    max-width: 48ch;
+  }
+
+  .lobby-players {
+    display: flex;
+  }
+}
+
+.template-card {
+  min-height: 6em !important;
+  background: #fafafa;
+  border-radius: 16px;
+}
+
+.template-content {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+}
+
+.game-card {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  text-align: center;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card {
+  background-color: #1e1e1e !important;
+  color: #f1f1f1 !important;
+  border: 1px solid #2c2c2c !important;
+}
+
+.outline-success {
+  outline: 2px solid rgb(25, 135, 84) !important;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.card-grid > * {
+  height: 100%;
+}
+
+
+.card-grid-mobile {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 0.5rem;
+}
