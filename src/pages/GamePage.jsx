@@ -176,7 +176,7 @@ export default function GamePage({ state, setState, tr }) {
 
       { /* MOBILE */}
       <Row>
-        <div className="d-md-none card-grid-mobile p-2" style={{ minHeight: "20em", fontSize: "0.5em" }}>
+        <div className="d-md-none card-grid-mobile p-2" style={{ minHeight: "20em", fontSize: ".75em" }}>
           {
             state.lobby.selectedCards.map((card, i) => (
               <Card
@@ -190,7 +190,7 @@ export default function GamePage({ state, setState, tr }) {
           }
         </div>
 
-        <div className="d-md-none card-grid-mobile p-2" style={{ fontSize: "0.5em", outline: "2px solid white" }}>
+        <div className="d-md-none card-grid-mobile p-2" style={{ fontSize: ".75em", outline: "2px solid white" }}>
 
           {
             state.lobby.availableCards.map((card, i) => (

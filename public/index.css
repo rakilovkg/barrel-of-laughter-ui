@@ -86,8 +86,8 @@ html, body {
 
 .card-grid-mobile {
   display: grid;
-  grid-template-columns: 50% 50%;
-  grid-template-rows: 7em 7em 7em 7em 7em;
+  grid-template-columns: repeat(2, 14em);
+  grid-template-rows: repeat(5, 4.75em);
 
   gap: 0.5em;
 }
