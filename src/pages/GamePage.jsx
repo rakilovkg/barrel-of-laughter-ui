@@ -67,10 +67,16 @@ export default function GamePage({ state, setState, tr }) {
       });
     };
 
+    // Initial countdown
+    if (state.lobby.timeRemaining && state.lobby.timeRemaining > 0) {
+      timerIdRef.current = setTimeout(onSecondPassed, 1000);
+    }
+
     ws.onmessage = (message) => {
       const data = JSON.parse(message.data);
 
       setState(prev => ({ ...prev, lobby: { ...prev.lobby, ...data.lobby } }));
+
 
       if (data.lobby.timeRemaining) {
         clearTimeout(timerIdRef.current);
@@ -137,21 +143,24 @@ export default function GamePage({ state, setState, tr }) {
         >
 
           <div className="card-grid">
-            {state.lobby.selectedCards.map((card) => (
-              <Card key={card} className="flex-fill d-flex">
-                <Card.Body className="small d-flex align-items-center justify-content-center text-center">
-                  {tr(card)}
-                </Card.Body>
+            {state.lobby.selectedCards.map((card, i) => (
+              <Card
+                key={card}
+                className={`${state.lobby.winningCardIndex === i ? "outline-success" : ""}`}
+                onClick={() => onSelectedCardClicked(i)}
+              >
+                <Card.Body className="small">{tr(card)}</Card.Body>
               </Card>
             ))}
           </div>
 
           <div className="card-grid rounded p-2" style={{ outline: "2px solid white" }}>
-            {state.lobby.availableCards.map((card) => (
-              <Card key={card} className="flex-fill d-flex">
-                <Card.Body className="small d-flex align-items-center justify-content-center text-center">
-                  {tr(card)}
-                </Card.Body>
+            {state.lobby.availableCards.map((card, i) => (
+              <Card
+                key={card}
+                onClick={() => onAvailableCardClicked(i)}
+              >
+                <Card.Body className="small">{tr(card)}</Card.Body>
               </Card>
             ))}
           </div>
@@ -166,31 +175,36 @@ export default function GamePage({ state, setState, tr }) {
 
 
       { /* MOBILE */}
-      <div className="d-md-none card-grid-mobile p-2" style={{ height: "20em", fontSize: "0.85em" }}>
-        {
-          state.lobby.selectedCards.map((card, i) => (
-            <Card
-              className={`${state.lobby.winningCardIndex === i ? "outline-success" : ""}`}
-              onClick={() => onSelectedCardClicked(i)}
-            >
-              <Card.Body className="small">{tr(card)}</Card.Body>
-            </Card>
-          ))
-        }
-      </div>
+      <Row>
+        <div className="d-md-none card-grid-mobile p-2" style={{ minHeight: "20em", fontSize: "0.5em" }}>
+          {
+            state.lobby.selectedCards.map((card, i) => (
+              <Card
+                key={card}
+                className={`${state.lobby.winningCardIndex === i ? "outline-success" : ""}`}
+                onClick={() => onSelectedCardClicked(i)}
+              >
+                <Card.Body className="small">{tr(card)}</Card.Body>
+              </Card>
+            ))
+          }
+        </div>
 
+        <div className="d-md-none card-grid-mobile p-2" style={{ fontSize: "0.5em", outline: "2px solid white" }}>
 
-      <div className="d-md-none card-grid-mobile p-2" style={{ height: "20em", fontSize: "0.85em" }}>
+          {
+            state.lobby.availableCards.map((card, i) => (
+              <Card
+                key={card}
+                onClick={() => onAvailableCardClicked(i)}
+              >
+                <Card.Body className="small">{tr(card)}</Card.Body>
+              </Card>
+            ))
+          }
 
-        {
-          state.lobby.availableCards.map(card => (
-            <Card onClick={() => onAvailableCardClicked(card)}>
-              <Card.Body className="small">{tr(card)}</Card.Body>
-            </Card>
-          ))
-        }
-
-      </div>
+        </div>
+      </Row>
 
 
       <Offcanvas
@@ -220,12 +234,12 @@ function ScorePanel({ players, tr, winnerName }) {
         <Table responsive>
           <tbody>
             {Object.entries(players).map(([playerName, playerData]) => (
-              <tr key={playerName} className={`text-light ${(winnerName == playerName ? "outline-success" : "")}`}>
+              <tr key={playerName} className={`text-light ${winnerName == playerName ? "outline-success" : ""}`}>
                 <td width="40" className="bg-dark">
                   <BsPersonFill className="text-light" />
                 </td>
                 <td className="bg-dark text-light">{playerName}</td>
-                <td className="text-end fw-bold bg-dark text-light">
+                <td className={`text-end fw-bold bg-dark text-light ${winnerName == playerName ? "winner-right-border" : ""}`}>
                   {playerData.score}
                 </td>
               </tr>

@@ -62,12 +62,20 @@ html, body {
 
 .outline-success {
   outline: 2px solid rgb(25, 135, 84) !important;
+  border-left: 1px solid rgb(25, 135, 84) !important;
+}
+
+.winner-right-border {
+  border-right: 1px solid rgb(25, 135, 84) !important;
 }
 
 .card-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(2, 1fr);
+
+  min-height: 14em;
+
   gap: 0.5rem;
   height: 100%;
 }
@@ -76,10 +84,10 @@ html, body {
   height: 100%;
 }
 
-
 .card-grid-mobile {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(5, 1fr);
-  gap: 0.5rem;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: 7em 7em 7em 7em 7em;
+
+  gap: 0.5em;
 }
